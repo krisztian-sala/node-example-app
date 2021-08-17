@@ -1,0 +1,108 @@
+name: Test
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+      types: [opened, synchronize, reopened]
+  workflow_dispatch:
+jobs:
+#   sonar:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - uses: actions/checkout@v2
+#       # with:
+#         # Disabling shallow clone is recommended for improving relevancy of reporting
+#         # fetch-depth: 0
+#     - name: SonarCloud Scan
+#       uses: sonarsource/sonarcloud-github-action@v1.6
+#       with:
+#          args: >
+#           -Dsonar.organization=jokr-services
+#           -Dsonar.projectKey=JOKR-Services_checkout-web-checkout
+#           -Dsonar.verbose=true
+#       env:
+#         # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  trivy:
+    name: Trivy scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        # with:
+        #   ref: ${{ github.ref }}
+        #   token: ${{ secrets.GITHUB_TOKEN }}
+    
+      - name: Build an image from Dockerfile
+        run:  docker build -t checkout-web-checkout .
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        continue-on-error: true
+        with:
+          image-ref: 'checkout-web-checkout'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+  test:
+    name: Testing
+    runs-on: ubuntu-latest
+    needs: trivy
+    steps:
+      - name: Echo
+        run: echo 123
+  linter:
+    name: Mega-Linter
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Mega-Linter
+        id: ml
+        uses: nvuillam/mega-linter@v4.43.0
+        env:
+          # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # ADD YOUR CUSTOM ENV VARIABLES HERE OR DEFINE THEM IN A FILE .mega-linter.yml AT THE ROOT OF YOUR REPOSITORY
+          # DISABLE: COPYPASTE,SPELL # Uncomment to disable copy-paste and spell checks
+          ENABLE:  YAML, KUBERNETES, JAVASCRIPT
+          PRINT_ALPACA: false
+
+      - name: Lint Code Base
+        uses: github/super-linter@v4.6.1
+        env:
+          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_JAVASCRIPT: true
+          DEFAULT_BRANCH: master
+          GITHUB_ORG: test
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  sast:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Self sast-scan
+        uses: AppThreat/sast-scan-action@v1.0.0
+        with:
+          output: reports
+          type: nodejs
+
+  basic:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}
+      - run: echo "🍏 This job's status is ${{ job.status }}."
