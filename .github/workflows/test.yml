@@ -25,16 +25,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        # with:
-        #   ref: ${{ github.ref }}
-        #   token: ${{ secrets.GITHUB_TOKEN }}
-    
+        
       - name: Build an image from Dockerfile
         run:  docker build -t checkout-web-checkout .
       
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
-        continue-on-error: true
+#         continue-on-error: true
         with:
           image-ref: 'checkout-web-checkout'
           format: 'table'
@@ -46,7 +43,7 @@ jobs:
   mega-linter:
     name: Mega-Linter
     runs-on: ubuntu-latest
-    continue-on-error: true
+#     continue-on-error: true
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -57,7 +54,7 @@ jobs:
       - name: Mega-Linter
         id: ml
         uses: nvuillam/mega-linter/flavors/javascript@v4
-        continue-on-error: true
+#         continue-on-error: true
         env:
           # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # ADD YOUR CUSTOM ENV VARIABLES HERE OR DEFINE THEM IN A FILE .mega-linter.yml AT THE ROOT OF YOUR REPOSITORY
@@ -68,7 +65,7 @@ jobs:
   super-linter:
     name: Super-Linter
     runs-on: ubuntu-latest
-    continue-on-error: true
+#     continue-on-error: true
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
