@@ -56,7 +56,7 @@ jobs:
 
       - name: Mega-Linter
         id: ml
-        uses: nvuillam/mega-linter@v4.43.0
+        uses: nvuillam/mega-linter/flavors/javascript@v4
         continue-on-error: true
         env:
           # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -76,7 +76,7 @@ jobs:
           fetch-depth: 0
           
       - name: Super-linter
-        uses: github/super-linter@v4.6.1
+        uses: docker://ghcr.io/github/super-linter:slim-v4
         env:
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_JAVASCRIPT: true
