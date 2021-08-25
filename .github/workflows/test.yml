@@ -88,4 +88,28 @@ jobs:
         with:
           output: reports
           type: nodejs
+  shift-left-sec:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Cache vdb
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ github.workspace }}/vdb
+          key: ${{ runner.os }}
+      - name: Scan
+        uses: ShiftLeftSecurity/scan-action@master
+        env:
+          VDB_HOME: ${{ github.workspace }}/vdb
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SCAN_AUTO_BUILD: true
+        with:
+          output: reports
+      - name: Upload scan reports
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: shiftleft-scan-reports
+          path: reports
 
