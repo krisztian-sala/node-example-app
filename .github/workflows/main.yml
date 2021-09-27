@@ -20,7 +20,7 @@ jobs:
       - name: Setup matrix combinations
         id: setup-matrix-combinations
         run: |
-          regions=`echo ${{ github.event.inputs.deploy_region }} | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'  | tr ' ' ',' `
+          regions=`echo ${{ github.event.inputs.deploy_region }} | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'  | tr ' ' ', ' `
           echo ::set-output name=regions::[$regions]
     outputs:
       regions: ${{ steps.setup-matrix-combinations.outputs.regions }}
@@ -31,8 +31,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: setup-matrix
     strategy:
-          matrix: 
-            regions: ${{ needs.setup-matrix.outputs.regions}}
+        matrix: 
+          regions: ${{ needs.setup-matrix.outputs.regions}}
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
         
