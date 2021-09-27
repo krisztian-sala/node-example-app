@@ -18,11 +18,17 @@ jobs:
   Deploy_On_Prod:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          region: [at, pl]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
         
       - name: Deployment regions
         run: echo Deploying on regions ${{ github.event.inputs.deploy_region }}
+
+      - name: Deployment regions
+        run: echo Deploying on region ${{ matrix.region }}
 
       - uses: actions/checkout@v2
