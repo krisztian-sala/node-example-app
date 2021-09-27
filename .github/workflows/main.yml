@@ -2,7 +2,6 @@
 
 name: CI
 
-# Controls when the workflow will run
 on:
   workflow_dispatch:
     inputs:
@@ -10,39 +9,27 @@ on:
         description: 'Countries to deploy the App'     
         required: true
         default: 'us mx co pe at pl'
-    
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+  
 jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup matrix combinations
-        id: setup-matrix-combinations
+      - name: Handle User Input
+        id: set-regions
         run: |
           regions=`echo ${{ github.event.inputs.deploy_region }} | sed -e 's/^[[:space:]]*/"/' -e 's/[[:space:]]*$/"/' -e 's/[[:space:]]\{1,\}/","/g'`
           echo ::set-output name=regions::[$regions]
     outputs:
-      regions: ${{ steps.setup-matrix-combinations.outputs.regions }}
+      regions: ${{ steps.set-regions.outputs.regions }}
  
-  # This workflow contains a single job called "build"
-  Deploy_On_Prod:
-    # The type of runner that the job will run on
+  deploy:
     runs-on: ubuntu-latest
     needs: setup
     strategy:
         matrix: 
           region: ${{fromJson(needs.setup.outputs.regions)}}
-#     strategy:
-#         matrix:
-#           region:  [at, pl]
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-        
-      - name: Deployment regions
-        run: echo Deploying on regions ${{ github.event.inputs.deploy_region }}
-
-      - name: Deployment regions
+      - name: Deployment region
         run: echo Deploying on region ${{ matrix.region }}
 
       - uses: actions/checkout@v2
