@@ -20,7 +20,7 @@ jobs:
       - name: Setup matrix combinations
         id: setup-matrix-combinations
         run: |
-          regions=`echo ${{ github.event.inputs.deploy_region }} | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/[[:space:]]\{1,\}/, /g'`
+          regions=`echo ${{ github.event.inputs.deploy_region }} | sed -e 's/^[[:space:]]*/"/' -e 's/[[:space:]]*$/"/' -e 's/[[:space:]]\{1,\}/", "/g'`
           echo ::set-output name=regions::[$regions]
     outputs:
       regions: ${{ steps.setup-matrix-combinations.outputs.regions }}
