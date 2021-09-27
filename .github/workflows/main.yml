@@ -14,7 +14,7 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  setup-matrix:
+  setup:
     runs-on: ubuntu-latest
     steps:
       - name: Setup matrix combinations
@@ -29,13 +29,13 @@ jobs:
   Deploy_On_Prod:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    needs: setup-matrix
+    needs: setup
     strategy:
         matrix: 
-          region: ${{ needs.setup-matrix.outputs.regions}}
+          region: ${{fromJson(needs.setup.outputs.regions)}}
 #     strategy:
 #         matrix:
-#           region: [at, pl]
+#           region:  [at, pl]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
         
